@@ -1,0 +1,5 @@
+<h1>Edit Operator sessions</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.operator_sessions_path(@conn, :update, @operator_sessions)) %>
+
+<span><%= link "Back", to: Routes.operator_sessions_path(@conn, :index) %></span>

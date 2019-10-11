@@ -7,6 +7,7 @@ defmodule TimeTurnerWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Phoenix.LiveView.Flash
   end
 
   pipeline :api do
@@ -15,6 +16,8 @@ defmodule TimeTurnerWeb.Router do
 
   scope "/", TimeTurnerWeb do
     pipe_through :browser
+
+    live "/operator", OperatorLive
 
     get "/", PageController, :index
   end
