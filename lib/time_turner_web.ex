@@ -49,6 +49,15 @@ defmodule TimeTurnerWeb do
     end
   end
 
+  def live_view do
+    quote do
+      alias TimeTurnerWeb.Router.Helpers, as: Routes
+
+      import Phoenix.LiveView,
+             only: [live_render: 2, live_render: 3, live_link: 1, live_link: 2]
+    end
+  end
+
   def router do
     quote do
       use Phoenix.Router

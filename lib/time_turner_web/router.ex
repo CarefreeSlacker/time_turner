@@ -1,5 +1,6 @@
 defmodule TimeTurnerWeb.Router do
   use TimeTurnerWeb, :router
+  alias TimeTurner.Plugs.ParamsToSession
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -17,13 +18,13 @@ defmodule TimeTurnerWeb.Router do
   scope "/", TimeTurnerWeb do
     pipe_through :browser
 
-    live "/operator", OperatorLive
-
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", TimeTurnerWeb do
-  #   pipe_through :api
-  # end
+  scope "/operator", TimeTurnerWeb do
+    pipe_through [:browser, ParamsToSession]
+
+    live "/order/:order_id", OrderLive, session: [:request_params]
+    live "/", OperatorLive, session: [:request_params]
+  end
 end
