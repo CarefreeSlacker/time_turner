@@ -15,6 +15,8 @@ import "phoenix_html"
 //
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
+
+// LiveView
 import "mdn-polyfills/CustomEvent"
 import "mdn-polyfills/String.prototype.startsWith"
 import "mdn-polyfills/Array.from"
@@ -30,3 +32,6 @@ import LiveSocket from "phoenix_live_view"
 
 let liveSocket = new LiveSocket("/live", Socket)
 liveSocket.connect()
+
+// Additional imports
+import '../node_modules/bootstrap/dist/js/bootstrap.bundle.min';
