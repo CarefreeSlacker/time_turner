@@ -4,7 +4,7 @@ defmodule TimeTurnerWeb.OperatorLive do
 
   alias TimeTurnerWeb.OrderLive
   alias TimeTurnerWeb.Router.Helpers, as: Routes
-  import TimeTurner.Orders.Context, only: [seconds_to_minutes: 1]
+  import TimeTurner.Orders, only: [time_left: 1]
 
   def render(assigns) do
     ~L"""
@@ -15,7 +15,7 @@ defmodule TimeTurnerWeb.OperatorLive do
         <%= Enum.map(@orders, fn order -> %>
           <div class="card">
             <div class="card-header">
-              <span class="badge badge-pill badge-primary"><%= seconds_to_minutes(order.seconds_left) %></span>
+              <span class="badge badge-pill badge-primary"><%= time_left(order) %></span>
               <%= live_link("To order", to: Routes.live_path(@socket, OrderLive, order.id)) %>
             </div>
             <div class="card-body">
@@ -32,8 +32,9 @@ defmodule TimeTurnerWeb.OperatorLive do
   end
 
   def mount(params, socket) do
-    final_socket = socket
-    |> assign(:orders, orders())
+    final_socket =
+      socket
+      |> assign(:orders, orders())
 
     {:ok, final_socket}
   end
@@ -43,19 +44,21 @@ defmodule TimeTurnerWeb.OperatorLive do
       %{
         id: 3442,
         total_price: 150,
-        seconds_left: 123,
+        create_order_time: NaiveDateTime.utc_now(),
         items: [
           %{name: "Espresso", price: 100},
           %{name: "Muffin", price: 50}
-        ]
+        ],
+        customer_id: 1
       },
       %{
         id: 3445,
         total_price: 100,
-        seconds_left: 185,
+        create_order_time: NaiveDateTime.utc_now(),
         items: [
           %{name: "Cappucino", price: 100}
-        ]
+        ],
+        customer_id: 2
       }
     ]
   end

@@ -2,7 +2,7 @@ defmodule TimeTurnerWeb.OrderLive do
   use TimeTurnerWeb, :live_view
   use Phoenix.LiveView
   alias TimeTurnerWeb.OperatorLive
-  import TimeTurner.Orders.Context, only: [seconds_to_minutes: 1]
+  import TimeTurner.Orders, only: [time_left: 1]
 
   def render(assigns) do
     ~L"""
@@ -13,6 +13,7 @@ defmodule TimeTurnerWeb.OrderLive do
       <div class="card">
         <div class="card-header">
           <span class="badge badge-pill badge-primary">Order #<%= @order.id %></span>
+          <span class="badge badge-pill badge-primary"><%= time_left(order) %></span>
           <%= live_link("To operator page", to: Routes.live_path(@socket, OperatorLive)) %>
         </div>
         <div class="card-body">

@@ -2,11 +2,15 @@ defmodule TimeTurner.Application do
   @moduledoc false
 
   use Application
+  alias TimeTurner.Otp.{CustomerSupervisor, OperatorWorker, OrderManager}
 
   def start(_type, _args) do
     children = [
       TimeTurner.Repo,
-      TimeTurnerWeb.Endpoint
+      TimeTurnerWeb.Endpoint,
+      CustomerSupervisor,
+      OrderManager,
+      OperatorWorker
     ]
 
     opts = [strategy: :one_for_one, name: TimeTurner.Supervisor]

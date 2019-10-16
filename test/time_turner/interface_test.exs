@@ -30,7 +30,8 @@ defmodule TimeTurner.InterfaceTest do
     end
 
     test "create_operator_sessions/1 with valid data creates a operator_sessions" do
-      assert {:ok, %OperatorSessions{} = operator_sessions} = Interface.create_operator_sessions(@valid_attrs)
+      assert {:ok, %OperatorSessions{} = operator_sessions} =
+               Interface.create_operator_sessions(@valid_attrs)
     end
 
     test "create_operator_sessions/1 with invalid data returns error changeset" do
@@ -39,19 +40,27 @@ defmodule TimeTurner.InterfaceTest do
 
     test "update_operator_sessions/2 with valid data updates the operator_sessions" do
       operator_sessions = operator_sessions_fixture()
-      assert {:ok, %OperatorSessions{} = operator_sessions} = Interface.update_operator_sessions(operator_sessions, @update_attrs)
+
+      assert {:ok, %OperatorSessions{} = operator_sessions} =
+               Interface.update_operator_sessions(operator_sessions, @update_attrs)
     end
 
     test "update_operator_sessions/2 with invalid data returns error changeset" do
       operator_sessions = operator_sessions_fixture()
-      assert {:error, %Ecto.Changeset{}} = Interface.update_operator_sessions(operator_sessions, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Interface.update_operator_sessions(operator_sessions, @invalid_attrs)
+
       assert operator_sessions == Interface.get_operator_sessions!(operator_sessions.id)
     end
 
     test "delete_operator_sessions/1 deletes the operator_sessions" do
       operator_sessions = operator_sessions_fixture()
       assert {:ok, %OperatorSessions{}} = Interface.delete_operator_sessions(operator_sessions)
-      assert_raise Ecto.NoResultsError, fn -> Interface.get_operator_sessions!(operator_sessions.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Interface.get_operator_sessions!(operator_sessions.id)
+      end
     end
 
     test "change_operator_sessions/1 returns a operator_sessions changeset" do

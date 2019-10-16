@@ -3,7 +3,6 @@ defmodule TimeTurner.Interface.OperatorSessions do
   import Ecto.Changeset
 
   schema "operator_sessions" do
-
     timestamps()
   end
 
