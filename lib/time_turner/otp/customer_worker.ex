@@ -8,7 +8,7 @@ defmodule TimeTurner.Otp.CustomerWorker do
   alias TimeTurner.Orders.{Item, Order}
   alias TimeTurner.Otp.OperatorWorker
 
-  @spec add_item(pid, Item.t) :: list(Item)
+  @spec add_item(pid, Item.t()) :: list(Item)
   def add_item(pid, item) do
     GenServer.call(pid, {:add_item, item})
   end
@@ -18,14 +18,19 @@ defmodule TimeTurner.Otp.CustomerWorker do
     GenServer.call(pid, :get_items)
   end
 
-  @spec set_order(pid, Order.t) :: {:ok, Order.t} | {:ok, :order_already_exist}
+  @spec set_order(pid, Order.t()) :: {:ok, Order.t()} | {:error, :order_already_exist}
   def set_order(pid, order) do
     GenServer.call(pid, {:set_order, order})
   end
 
-  @spec update_order(pid, Order.t) :: {:ok, Order.t} | {:ok, :order_does_not_exist}
+  @spec update_order(pid, Order.t()) :: {:ok, Order.t()} | {:error, :order_does_not_exist}
   def update_order(pid, order) do
     GenServer.call(pid, {:update_order, order})
+  end
+
+  @spec remove_order(pid) :: {:ok, Order.t()} | {:error, :order_does_not_exist}
+  def remove_order(pid) do
+    GenServer.call(pid, :remove_order)
   end
 
   @spec lookup_worker(integer) :: pid | nil
@@ -56,18 +61,26 @@ defmodule TimeTurner.Otp.CustomerWorker do
   end
 
   def handle_call({:set_order, order}, _from, %{order: nil} = state) do
-    {:reply, order, %{state | order: order}}
+    {:reply, {:ok, order}, %{state | order: order}}
   end
 
   def handle_call({:set_order, _order}, _from, state) do
-    {:reply, :order_already_exist, state}
+    {:reply, {:error, :order_already_exist}, state}
   end
 
   def handle_call({:update_order, _order}, _from, %{order: nil} = state) do
-    {:reply, :order_does_not_exist, state}
+    {:reply, {:error, :order_does_not_exist}, state}
   end
 
   def handle_call({:update_order, order}, _from, state) do
-    {:reply, order, %{state | order: order}}
+    {:reply, {:ok, order}, %{state | order: order}}
+  end
+
+  def handle_call(:remove_order, _from, %{order: nil} = state) do
+    {:reply, {:error, :order_does_not_exist}, state}
+  end
+
+  def handle_call(:remove_order, _from, %{order: order} = state) do
+    {:reply, {:ok, order}, %{state | order: nil, items: []}}
   end
 end

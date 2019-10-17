@@ -19,7 +19,8 @@ defmodule TimeTurner.Orders.Order do
       items: items_list,
       create_order_time: NaiveDateTime.utc_now(),
       customer_id: customer_id,
-      finished: false
+      finished: false,
+      total_price: Enum.reduce(items_list, 0, fn %{price: price}, sum -> price + sum end)
     }
   end
 end

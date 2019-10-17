@@ -11,17 +11,17 @@ defmodule TimeTurner.Otp.OperatorWorker do
     GenServer.call(__MODULE__, {:add_order, order})
   end
 
-  @spec finish_order(Order.t()) :: {:ok, Order.t()} | {:error, :order_does_not_exist}
-  def finish_order(order) do
-    GenServer.call(__MODULE__, {:finish_order, order})
+  @spec finish_order(integer) :: {:ok, Order.t()} | {:error, :order_does_not_exist}
+  def finish_order(order_id) do
+    GenServer.call(__MODULE__, {:finish_order, order_id})
   end
 
-  @spec remove_order(Order.t()) ::
+  @spec remove_order(integer) ::
           {:ok, list(Order.t())}
           | {:ok, :order_does_not_finished}
           | {:ok, :order_does_not_exist}
-  def remove_order(order) do
-    GenServer.call(__MODULE__, {:remove_order, order})
+  def remove_order(order_id) do
+    GenServer.call(__MODULE__, {:remove_order, order_id})
   end
 
   def start_link(_opts) do
@@ -37,39 +37,42 @@ defmodule TimeTurner.Otp.OperatorWorker do
     {:reply, {:ok, new_orders}, %{state | orders: new_orders}}
   end
 
-  def handle_call({:finish_order, order}, _from, %{orders: orders} = state) do
-    order
+  def handle_call({:finish_order, order_id}, _from, %{orders: orders} = state) do
+    order_id
     |> find_order_index(orders)
     |> case do
       nil ->
         {:reply, {:error, :order_does_not_exist}, state}
+
       order_index ->
-        old_order = Enum.at(orders)
+        old_order = Enum.at(orders, order_index)
         new_order = %{old_order | finished: true}
         new_orders = List.update_at(orders, order_index, fn _v -> new_order end)
         {:reply, {:ok, new_order}, %{state | orders: new_orders}}
     end
   end
 
-  def handle_call({:remove_order, order}, _from, %{orders: orders} = state) do
-    order
+  def handle_call({:remove_order, order_id}, _from, %{orders: orders} = state) do
+    order_id
     |> find_order_index(orders)
     |> case do
-         nil ->
-           {:reply, {:error, :order_does_not_exist}, state}
-         order_index ->
-           found_order = Enum.at(orders)
-           if(found_order.finished) do
-             new_orders = List.delete(orders, order_index)
-             {:reply, {:ok, new_orders}, %{state | orders: new_orders}}
-           else
-             {:reply, {:error, :order_does_not_finished}, state}
-           end
-       end
+      nil ->
+        {:reply, {:error, :order_does_not_exist}, state}
+
+      order_index ->
+        found_order = Enum.at(orders, order_index)
+
+        if(found_order.finished) do
+          new_orders = List.delete(orders, found_order)
+          {:reply, {:ok, found_order}, %{state | orders: new_orders}}
+        else
+          {:reply, {:error, :order_does_not_finished}, state}
+        end
+    end
   end
 
-  @spec find_order_index(Order.t, list(Order)) :: Order.t | nil
-  defp find_order_index(%{id: search_order_id} = order, orders_list) do
+  @spec find_order_index(integer, list(Order)) :: Order.t() | nil
+  defp find_order_index(search_order_id, orders_list) do
     Enum.find_index(orders_list, &(&1.id == search_order_id))
   end
 end

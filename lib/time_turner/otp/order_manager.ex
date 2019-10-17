@@ -7,7 +7,7 @@ defmodule TimeTurner.Otp.OrderManager do
   use GenServer
   alias TimeTurner.Orders.Item
 
-  @spec find_item(integer) :: Item.t | nil
+  @spec find_item(integer) :: Item.t() | nil
   def find_item(item_id) do
     GenServer.call(__MODULE__, {:get_item, item_id})
   end
@@ -17,12 +17,17 @@ defmodule TimeTurner.Otp.OrderManager do
     GenServer.call(__MODULE__, :next_order_id)
   end
 
+  @spec next_customer_id :: integer
+  def next_customer_id do
+    GenServer.call(__MODULE__, :next_customer_id)
+  end
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init(_) do
-    {:ok, %{items_list: default_items_list(), next_order_id: 1}}
+    {:ok, %{items_list: default_items_list(), next_order_id: 1, next_customer_id: 1}}
   end
 
   defp default_items_list do
@@ -43,6 +48,10 @@ defmodule TimeTurner.Otp.OrderManager do
   end
 
   def handle_call(:next_order_id, _from, %{next_order_id: next_order_id} = state) do
-    {:reply, next_order_id, %{state | next_order_id: (next_order_id + 1)}}
+    {:reply, next_order_id, %{state | next_order_id: next_order_id + 1}}
+  end
+
+  def handle_call(:next_customer_id, _from, %{next_customer_id: next_customer_id} = state) do
+    {:reply, next_customer_id, %{state | next_customer_id: next_customer_id + 1}}
   end
 end
