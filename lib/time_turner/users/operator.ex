@@ -41,4 +41,7 @@ defmodule TimeTurner.Users.Operator do
         {:error, reason}
     end
   end
+
+  defdelegate get_orders, to: OperatorWorker
+  defdelegate get_order(order_id), to: OperatorWorker
 end

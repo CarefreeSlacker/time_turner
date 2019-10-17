@@ -24,6 +24,16 @@ defmodule TimeTurner.Otp.OperatorWorker do
     GenServer.call(__MODULE__, {:remove_order, order_id})
   end
 
+  @spec get_orders :: {:ok, list(Order.t())}
+  def get_orders do
+    GenServer.call(__MODULE__, :get_orders)
+  end
+
+  @spec get_order(integer) :: {:ok, Order.t()} | {:error, :order_does_not_exist}
+  def get_order(order_id) do
+    GenServer.call(__MODULE__, {:get_order, order_id})
+  end
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -71,8 +81,29 @@ defmodule TimeTurner.Otp.OperatorWorker do
     end
   end
 
-  @spec find_order_index(integer, list(Order)) :: Order.t() | nil
-  defp find_order_index(search_order_id, orders_list) do
+  def handle_call(:get_orders, _from, %{orders: orders} = state) do
+    {:reply, {:ok, orders}, state}
+  end
+
+  def handle_call({:get_order, order_id}, _from, %{orders: orders} = state) do
+    order_id
+    |> find_order_index(orders)
+    |> case do
+      nil ->
+        {:reply, {:error, :order_does_not_exist}, state}
+
+      order_index ->
+        {:reply, {:ok, Enum.at(orders, order_index)}, state}
+    end
+  end
+
+  @spec find_order_index(integer | binary, list(Order)) :: Order.t() | nil
+  defp find_order_index(search_order_id, orders_list) when is_integer(search_order_id) do
     Enum.find_index(orders_list, &(&1.id == search_order_id))
+  end
+
+  defp find_order_index(search_order_id, orders_list) when is_binary(search_order_id) do
+    {integer_search_order_id, ""} = Integer.parse(search_order_id)
+    find_order_index(integer_search_order_id, orders_list)
   end
 end
