@@ -13,6 +13,11 @@ defmodule TimeTurner.Otp.CustomerWorker do
     GenServer.call(pid, {:add_item, item})
   end
 
+  @spec remove_item(pid, Item.t()) :: list(Item)
+  def remove_item(pid, item) do
+    GenServer.call(pid, {:remove_item, item})
+  end
+
   @spec get_items(pid) :: list(Item)
   def get_items(pid) do
     GenServer.call(pid, :get_items)
@@ -38,6 +43,11 @@ defmodule TimeTurner.Otp.CustomerWorker do
     GenServer.whereis(worker_alias(customer_id))
   end
 
+  @spec customer_state(pid) :: map
+  def customer_state(pid) do
+    :sys.get_state(pid)
+  end
+
   def worker_alias(customer_id) do
     :"#{__MODULE__}##{customer_id}"
   end
@@ -53,6 +63,11 @@ defmodule TimeTurner.Otp.CustomerWorker do
 
   def handle_call({:add_item, item}, _from, %{items: items} = state) do
     new_items = [item] ++ items
+    {:reply, new_items, %{state | items: new_items}}
+  end
+
+  def handle_call({:remove_item, item}, _from, %{items: items} = state) do
+    new_items = List.delete(items, item)
     {:reply, new_items, %{state | items: new_items}}
   end
 

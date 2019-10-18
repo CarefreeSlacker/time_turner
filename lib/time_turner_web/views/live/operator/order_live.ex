@@ -2,18 +2,15 @@ defmodule TimeTurnerWeb.OrderLive do
   use TimeTurnerWeb, :live_view
   use Phoenix.LiveView
 
-  @refresh_interval 3000
+  @refresh_interval 1000
 
   alias TimeTurner.Users.Operator
+  alias TimeTurner.Orders
   alias TimeTurnerWeb.OperatorLive
   alias Phoenix.LiveView, as: PhoenixLiveView
-  import TimeTurner.Orders, only: [time_left: 1]
 
   def render(%{order: order} = assigns) do
     ~L"""
-    <div>
-      <h1></h1>
-    </div>
     <div>
       <div class="card">
         <div class="card-header">
@@ -65,15 +62,18 @@ defmodule TimeTurnerWeb.OrderLive do
     """
   end
 
-  def mount(%{request_params: %{"order_id" => order_id}}, socket) do
-    schedule_refresh()
-
+  def handle_params(%{"order_id" => order_id}, _uri, socket) do
     initial_socket =
       socket
       |> assign(:order_id, order_id)
       |> get_socket_assigns(:initial)
 
-    {:ok, initial_socket}
+    {:noreply, initial_socket}
+  end
+
+  def mount(params, socket) do
+    schedule_refresh()
+    {:ok, socket}
   end
 
   defp schedule_refresh do
@@ -85,7 +85,7 @@ defmodule TimeTurnerWeb.OrderLive do
       {{:ok, order}, _} ->
         socket
         |> assign(:order, order)
-        |> assign(:time_left, time_left(order))
+        |> assign(:time_left, Orders.time_left(order))
 
       {{:error, :order_does_not_exist}, :initial} ->
         socket

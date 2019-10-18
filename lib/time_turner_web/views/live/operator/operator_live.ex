@@ -5,9 +5,9 @@ defmodule TimeTurnerWeb.OperatorLive do
   @refresh_interval 1000
   alias Phoenix.LiveView, as: PhoenixLiveView
   alias TimeTurner.Users.Operator
+  alias TimeTurner.Orders
   alias TimeTurnerWeb.OrderLive
   alias TimeTurnerWeb.Router.Helpers, as: Routes
-  import TimeTurner.Orders, only: [time_left: 1]
 
   def render(assigns) do
     ~L"""
@@ -62,7 +62,7 @@ defmodule TimeTurnerWeb.OperatorLive do
   end
 
   defp add_time_left_to_orders(orders) do
-    Enum.map(orders, &Map.put(&1, :time_left, time_left(&1)))
+    Enum.map(orders, &Map.put(&1, :time_left, Orders.time_left(&1)))
   end
 
   defp calculate_total_time_spent(orders) do

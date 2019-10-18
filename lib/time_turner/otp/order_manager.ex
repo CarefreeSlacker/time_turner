@@ -22,6 +22,11 @@ defmodule TimeTurner.Otp.OrderManager do
     GenServer.call(__MODULE__, :next_customer_id)
   end
 
+  @spec get_items :: list(Item.t())
+  def get_items do
+    GenServer.call(__MODULE__, :get_items)
+  end
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -53,5 +58,9 @@ defmodule TimeTurner.Otp.OrderManager do
 
   def handle_call(:next_customer_id, _from, %{next_customer_id: next_customer_id} = state) do
     {:reply, next_customer_id, %{state | next_customer_id: next_customer_id + 1}}
+  end
+
+  def handle_call(:get_items, _form, %{items_list: items_list} = state) do
+    {:reply, items_list, state}
   end
 end

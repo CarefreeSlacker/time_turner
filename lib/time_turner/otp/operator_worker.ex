@@ -5,6 +5,7 @@ defmodule TimeTurner.Otp.OperatorWorker do
 
   use GenServer
   alias TimeTurner.Orders.Order
+  alias TimeTurner.Utils
 
   @spec add_order(Order.t()) :: {:ok, list(Order.t())}
   def add_order(order) do
@@ -98,12 +99,8 @@ defmodule TimeTurner.Otp.OperatorWorker do
   end
 
   @spec find_order_index(integer | binary, list(Order)) :: Order.t() | nil
-  defp find_order_index(search_order_id, orders_list) when is_integer(search_order_id) do
-    Enum.find_index(orders_list, &(&1.id == search_order_id))
-  end
-
-  defp find_order_index(search_order_id, orders_list) when is_binary(search_order_id) do
-    {integer_search_order_id, ""} = Integer.parse(search_order_id)
-    find_order_index(integer_search_order_id, orders_list)
+  defp find_order_index(search_order_id, orders_list) do
+    integer_order_id = Utils.id_to_integer(search_order_id)
+    Enum.find_index(orders_list, &(&1.id == integer_order_id))
   end
 end

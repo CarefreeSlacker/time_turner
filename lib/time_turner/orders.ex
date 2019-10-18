@@ -6,6 +6,7 @@ defmodule TimeTurner.Orders do
   @seconds_count 60
   @order_time_limit 180
   alias TimeTurner.Orders.Order
+  alias TimeTurner.Otp.OrderManager
 
   def time_left(%{create_order_time: time}) do
     NaiveDateTime.utc_now()
@@ -13,6 +14,8 @@ defmodule TimeTurner.Orders do
     |> (fn seconds_spent -> @order_time_limit - seconds_spent end).()
     |> seconds_to_minutes()
   end
+
+  def time_left(_), do: nil
 
   @doc """
   Convert seconds amount to MM:SS view
@@ -29,4 +32,37 @@ defmodule TimeTurner.Orders do
   @spec double_digitize(integer) :: binary
   def double_digitize(value) when value < 10, do: "0#{value}"
   def double_digitize(value), do: "#{value}"
+
+  @spec order_stage(map) :: :initializing | :waiting | :finishing
+  def order_stage(%{order: nil}), do: :initializing
+  def order_stage(%{order: %Order{finished: false}}), do: :waiting
+  def order_stage(%{order: %Order{finished: true}}), do: :finishing
+
+  defdelegate get_items, to: OrderManager
+
+  @spec item_in_order_count(list, integer) :: integer
+  def item_in_order_count(items_list, search_item_id) do
+    items_list
+    |> Enum.filter(fn %{id: item_id} -> item_id == search_item_id end)
+    |> length()
+  end
+
+  @spec items_count(map) :: integer
+  def items_count(%{items: items}), do: length(items)
+  def items_count(_), do: 0
+
+  @spec total_price(map) :: integer
+  def total_price(%{total_price: total_price}), do: total_price
+
+  def total_price(%{items: items}) do
+    items
+    |> Enum.map(& &1.price)
+    |> Enum.sum()
+  end
+
+  def total_price(_), do: 0
+
+  @spec finished?(map) :: boolean
+  def finished?(%{finished: finished}), do: finished
+  def finished?(_), do: false
 end

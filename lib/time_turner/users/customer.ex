@@ -56,6 +56,22 @@ defmodule TimeTurner.Users.Customer do
     end
   end
 
+  @spec remove_item(integer, integer) ::
+          {:ok, list(Item.t())}
+          | {:error, :customer_does_not_exist}
+          | {:error, :item_does_not_exist}
+  def remove_item(customer_id, item_id) do
+    with {:customer, pid} when is_pid(pid) <-
+           {:customer, CustomerWorker.lookup_worker(customer_id)},
+         {:item, item} when is_map(item) <- {:item, OrderManager.find_item(item_id)},
+         items_list <- CustomerWorker.remove_item(pid, item) do
+      {:ok, items_list}
+    else
+      {:customer, nil} -> {:error, :customer_does_not_exist}
+      {:item, nil} -> {:error, :item_does_not_exist}
+    end
+  end
+
   @spec make_order(integer) ::
           {:ok, Order.t()}
           | {:error, :customer_does_not_exist}
@@ -105,6 +121,17 @@ defmodule TimeTurner.Users.Customer do
 
       pid ->
         CustomerWorker.remove_order(pid)
+    end
+  end
+
+  @spec get_state(integer) :: {:ok, map} | {:error, :customer_does_not_exist}
+  def get_state(customer_id) do
+    case CustomerWorker.lookup_worker(customer_id) do
+      nil ->
+        {:error, :customer_does_not_exist}
+
+      pid ->
+        CustomerWorker.customer_state(pid)
     end
   end
 end
