@@ -14,9 +14,9 @@ defmodule TimeTurnerWeb.OperatorLive do
     <div>
       <h1>Operator dashboard</h1>
     </div>
-    <div>
+    <div class="h2">
       <table class="table">
-        <tr>
+        <tr class="h1">
           <th>ID</th>
           <th>Time left</th>
           <th>Items count</th>
@@ -26,7 +26,7 @@ defmodule TimeTurnerWeb.OperatorLive do
         <%= Enum.map(@orders, fn order -> %>
           <tr>
             <td>
-              <span class="badge badge-pill <%= if(order.finished, do: "badge-success", else: "badge-primary") %> ">
+              <span class="badge badge-pill badge-<%= Orders.order_color(order) %> ">
                 Order #<%= order.id %>
               </span>
             </td>

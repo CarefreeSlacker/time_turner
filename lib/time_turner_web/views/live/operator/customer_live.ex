@@ -14,7 +14,7 @@ defmodule TimeTurnerWeb.CustomerLive do
       <div class="card">
         <div class="card-header">
           <table>
-            <tr>
+            <tr class="h1">
               <td>
                 Customer <%= @customer.name %> page
               </td>
@@ -27,7 +27,7 @@ defmodule TimeTurnerWeb.CustomerLive do
                 <span class="badge badge-pill badge-warning"><%= Orders.total_price(%{items: @items}) %></span>
               </td>
               <td>
-                <button class="btn btn-primary" phx-click="make_order">Make order</button>
+                <button class="btn btn-primary btn-xl" phx-click="make_order">Make order</button>
               </td>
             </tr>
           </table>
@@ -37,7 +37,7 @@ defmodule TimeTurnerWeb.CustomerLive do
             <table class="table">
               <tr><th>Name</th><th>Price</th><th>Current amount</th><th></th></tr>
               <%= Enum.map(@items_list, fn %{id: id, name: item_name, price: price} -> %>
-                <tr>
+                <tr class="h2">
                   <td><%= item_name %></td>
                   <td><%= price %></td>
                   <td><%= Orders.item_in_order_count(@items, id) %></td>
@@ -57,13 +57,66 @@ defmodule TimeTurnerWeb.CustomerLive do
 
   def render(%{order: order, order_stage: :waiting} = assigns) do
     ~L"""
-    <div>Implement waiting page</div>
+    <div>
+      <div class="card">
+        <div class="card-header h1">
+          <table>
+            <tr>
+              <td>
+                Order ID: <span class="badge badge-pill badge-<%= @order_color %>"><%= @order.id %></span>
+              </td>
+              <td>
+                <span>Total price: </span>
+                <span class="badge badge-pill badge-warning"><%= @order.total_price %></span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="card-body row">
+          <div class="offset-5 col-1">
+            <button class="rounded-circle btn btn-success btn-circle btn-xl">
+              <h1><%= @order_time_left %></h1>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 
   def render(%{order: order, order_stage: :finishing} = assigns) do
     ~L"""
-    <div>Implement finishing page</div>
+    <div>
+      <div class="card">
+        <div class="card-header h1">
+          <table>
+            <tr>
+              <td>
+                Order ID: <span class="badge badge-pill badge-<%= @order_color %>"><%= @order.id %></span>
+              </td>
+              <td>
+                <span>Total price: </span>
+                <span class="badge badge-pill badge-warning"><%= @order.total_price %></span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="offset-sm-3 offset-lg-5 col-1">
+              <button class="rounded-circle btn btn-danger btn-circle btn-xl">
+                <h1>Order complete</h1>
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="offset-sm-1 offset-lg-4">
+              <h2>Please pick up your coffee :). Have a nice day.</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 
@@ -102,6 +155,8 @@ defmodule TimeTurnerWeb.CustomerLive do
         |> assign(:order, order)
         |> assign(:items, items)
         |> assign(:customer, customer)
+        |> assign(:order_time_left, Orders.time_left(order))
+        |> assign(:order_color, Orders.order_color(order))
 
       {{:error, :customer_does_not_exist}, :initial} ->
         socket

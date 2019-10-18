@@ -13,11 +13,11 @@ defmodule TimeTurnerWeb.OrderLive do
     ~L"""
     <div>
       <div class="card">
-        <div class="card-header">
+        <div class="card-header h1">
           <table>
             <tr>
               <td>
-                <span class="badge badge-pill <%= if(@order.finished, do: "badge-success", else: "badge-primary") %> ">
+                <span class="badge badge-pill badge-<%= @order_color %> ">
                   Order #<%= @order.id %>
                 </span>
               </td>
@@ -27,15 +27,15 @@ defmodule TimeTurnerWeb.OrderLive do
               </td>
               <td>
                 <span>Total price: </span>
-                <span class="badge badge-pill badge-primary"><%= @order.total_price %></span>
+                <span class="badge badge-pill badge-warning"><%= @order.total_price %></span>
               </td>
               <td>
-                <button class="btn btn-primary" phx-click="to_operator_page">To operator page</button>
+                <button class="btn btn-primary" phx-click="to_operator_page"><h2>To operator page</h2></button>
               </td>
             </tr>
           </table>
         </div>
-        <div class="card-body">
+        <div class="card-body h2">
           <div>
             <table class="table">
               <tr><th>Name</th><th>Price</th></tr>
@@ -86,6 +86,7 @@ defmodule TimeTurnerWeb.OrderLive do
         socket
         |> assign(:order, order)
         |> assign(:time_left, Orders.time_left(order))
+        |> assign(:order_color, Orders.order_color(order))
 
       {{:error, :order_does_not_exist}, :initial} ->
         socket

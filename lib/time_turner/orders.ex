@@ -4,7 +4,7 @@ defmodule TimeTurner.Orders do
   """
 
   @seconds_count 60
-  @order_time_limit 180
+  @order_time_limit 10
   alias TimeTurner.Orders.Order
   alias TimeTurner.Otp.OrderManager
 
@@ -65,4 +65,16 @@ defmodule TimeTurner.Orders do
   @spec finished?(map) :: boolean
   def finished?(%{finished: finished}), do: finished
   def finished?(_), do: false
+
+  @spec order_color(Order.t()) :: binary
+  def order_color(%{finished: true}), do: "success"
+
+  def order_color(order) do
+    order
+    |> time_left()
+    |> case do
+      "00:00" -> "danger"
+      _ -> "primary"
+    end
+  end
 end
