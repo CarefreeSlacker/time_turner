@@ -134,4 +134,15 @@ defmodule TimeTurner.Users.Customer do
         CustomerWorker.customer_state(pid)
     end
   end
+
+  def start_customers do
+    [
+      %{name: "First user"},
+      %{name: "Second user"},
+      %{name: "Third user"},
+      %{name: "Fourth user"},
+      %{name: "Fifth user"}
+    ]
+    |> Enum.each(& start_for_customer(&1))
+  end
 end

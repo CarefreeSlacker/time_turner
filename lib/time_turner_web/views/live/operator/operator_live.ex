@@ -5,7 +5,7 @@ defmodule TimeTurnerWeb.OperatorLive do
   @refresh_interval 1000
   alias Phoenix.LiveView, as: PhoenixLiveView
   alias TimeTurner.Users.Operator
-  alias TimeTurner.Orders
+  alias TimeTurner.{Orders, Utils}
   alias TimeTurnerWeb.OrderLive
   alias TimeTurnerWeb.Router.Helpers, as: Routes
 
@@ -35,6 +35,7 @@ defmodule TimeTurnerWeb.OperatorLive do
             <td><%= order.total_price %></td>
             <td>
               <button class="btn btn-primary" phx-click="to_order_page" phx-value-order-id="<%= order.id %>">To order</button>
+              <button class="btn btn-success" phx-click="finish_order" phx-value-order-id="<%= order.id %>">Finished</button>
             </td>
           </tr>
         <% end) %>
@@ -76,6 +77,13 @@ defmodule TimeTurnerWeb.OperatorLive do
 
   def handle_event("to_order_page", %{"order-id" => order_id}, socket) do
     {:noreply, redirect_order_page(socket, order_id)}
+  end
+
+  def handle_event("finish_order", %{"order-id" => order_id}, socket) do
+    order_id
+    |> Utils.id_to_integer()
+    |> Operator.finish_order()
+    {:noreply, socket}
   end
 
   defp redirect_order_page(socket, order_id) do

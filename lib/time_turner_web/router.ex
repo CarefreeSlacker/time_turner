@@ -27,4 +27,10 @@ defmodule TimeTurnerWeb.Router do
     live "/", OperatorLive
     live "/customer/:customer_id", CustomerLive
   end
+
+  scope "/customer", TimeTurnerWeb do
+    pipe_through :browser
+
+    live "/:customer_id", CustomerLive
+  end
 end

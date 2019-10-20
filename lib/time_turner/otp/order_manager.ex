@@ -6,6 +6,7 @@ defmodule TimeTurner.Otp.OrderManager do
 
   use GenServer
   alias TimeTurner.Orders.Item
+  alias TimeTurner.Users.Customer
 
   @spec find_item(integer) :: Item.t() | nil
   def find_item(item_id) do
@@ -32,6 +33,7 @@ defmodule TimeTurner.Otp.OrderManager do
   end
 
   def init(_) do
+    start_customers()
     {:ok, %{items_list: default_items_list(), next_order_id: 1, next_customer_id: 1}}
   end
 
@@ -62,5 +64,22 @@ defmodule TimeTurner.Otp.OrderManager do
 
   def handle_call(:get_items, _form, %{items_list: items_list} = state) do
     {:reply, items_list, state}
+  end
+
+  defp start_customers do
+    Task.async(fn ->
+      [
+        %{name: "First user"},
+        %{name: "Second user"},
+        %{name: "Third user"},
+        %{name: "Fourth user"},
+        %{name: "Fifth user"}
+      ]
+      |> Enum.each(& Customer.start_for_customer(&1))
+    end)
+  end
+
+  def handle_info(_, state) do
+    {:noreply, state}
   end
 end

@@ -4,7 +4,7 @@ defmodule TimeTurner.Orders do
   """
 
   @seconds_count 60
-  @order_time_limit 10
+  @order_time_limit 480
   alias TimeTurner.Orders.Order
   alias TimeTurner.Otp.OrderManager
 
