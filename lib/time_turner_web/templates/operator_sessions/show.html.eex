@@ -1,0 +1,8 @@
+<h1>Show Operator sessions</h1>
+
+<ul>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.operator_sessions_path(@conn, :edit, @operator_sessions) %></span>
+<span><%= link "Back", to: Routes.operator_sessions_path(@conn, :index) %></span>

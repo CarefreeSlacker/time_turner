@@ -15,7 +15,8 @@ config :time_turner, TimeTurnerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "CxQklUAadY7jL8yW3v9cqCiRoKg8MYKnZXMQgrpPwJHwAN8HFIkLyv/cq1JRvoNh",
   render_errors: [view: TimeTurnerWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: TimeTurner.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: TimeTurner.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [signing_salt: "aIclgnvfvfWPWceiv+5ld94vqcAUE/aA"]
 
 # Configures Elixir's Logger
 config :logger, :console,

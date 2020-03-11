@@ -1,29 +1,22 @@
 defmodule TimeTurner.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
+  alias TimeTurner.Otp.{CustomerSupervisor, OperatorWorker, OrderManager}
 
   def start(_type, _args) do
-    # List all child processes to be supervised
     children = [
-      # Start the Ecto repository
       TimeTurner.Repo,
-      # Start the endpoint when the application starts
-      TimeTurnerWeb.Endpoint
-      # Starts a worker by calling: TimeTurner.Worker.start_link(arg)
-      # {TimeTurner.Worker, arg},
+      TimeTurnerWeb.Endpoint,
+      CustomerSupervisor,
+      OrderManager,
+      OperatorWorker
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: TimeTurner.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
   def config_change(changed, _new, removed) do
     TimeTurnerWeb.Endpoint.config_change(changed, removed)
     :ok
